@@ -1,0 +1,44 @@
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Helpdesk Management System
+ *
+ * A standalone Java Swing/AWT implementation based on the modules
+ * described in the Helpdesk Management System presentation.
+ *
+ * Features:
+ * 1. User Interface Module
+ * 2. Ticket Creation Module
+ * 3. Ticket Status Update Module
+ * 4. View Tickets Module
+ * 5. Admin Report Module
+ * 6. Clear Form Module
+ *
+ * Note: Tickets are stored in an ArrayList in memory. They will be lost
+ * when the application closes. A database can be added in a later version.
+ *
+ * Compile: javac FULLCODE.java
+ * Run:     java FULLCODE
+ */
+public class FULLCODE extends JFrame {
+    private static final long serialVersionUID = 1L;
+    private final List<Ticket> tickets = new ArrayList<>();
+    private int nextTicketId = 1;
+    private JTextField requesterField;
+    private JTextField emailField;
+    private JTextField titleField;
+    private JTextArea descriptionArea;
+    private JComboBox<String> priorityCombo;
+    private JComboBox<String> statusCombo;
+    private JLabel ticketCountLabel;
+    private JLabel latestTicketLabel;
+    private static final String[] PRIORITIES = {"Low", "Medium", "High", "Critical"};
+    private static final String[] STATUSES = {"Open", "In Progress", "Resolved"};
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

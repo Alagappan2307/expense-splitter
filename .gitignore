@@ -1,0 +1,22 @@
+# Build directories
+backend/target/
+frontend/dist/
+frontend/build/
+
+# Node modules
+frontend/node_modules/
+node_modules/
+
+# Local bundled maven (Render/GitHub have maven built-in)
+apache-maven-3.9.9/
+apache-maven-*.zip
+
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
