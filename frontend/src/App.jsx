@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
+
 import DashboardPage from './pages/DashboardPage';
 import GroupsPage from './pages/GroupsPage';
 import GroupDetailPage from './pages/GroupDetailPage';
@@ -10,6 +13,7 @@ import ExpenseHistoryPage from './pages/ExpenseHistoryPage';
 import BalancesPage from './pages/BalancesPage';
 import DebtSimplificationPage from './pages/DebtSimplificationPage';
 import SettlementsReportPage from './pages/SettlementsReportPage';
+
 import { api } from './api/apiService';
 
 export default function App() {
@@ -18,80 +22,160 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchGroups = (preferredId) => {
+  const fetchGroups = useCallback((preferredId) => {
     return api.getGroups()
       .then((data) => {
-        setGroups(data);
-        if (data.length > 0) {
-          if (preferredId && data.some((g) => g.id === preferredId)) {
-            setSelectedGroupId(preferredId);
-          } else if (!selectedGroupId) {
-            setSelectedGroupId(data[0].id);
+        const availableGroups = Array.isArray(data) ? data : [];
+        setGroups(availableGroups);
+
+        setSelectedGroupId((currentId) => {
+          if (
+            preferredId != null &&
+            availableGroups.some((group) => group.id === preferredId)
+          ) {
+            return preferredId;
           }
-        }
+
+          if (
+            currentId != null &&
+            availableGroups.some((group) => group.id === currentId)
+          ) {
+            return currentId;
+          }
+
+          return availableGroups.length > 0
+            ? availableGroups[0].id
+            : null;
+        });
       })
-      .catch((err) => {
-        console.error('Failed to load initial groups:', err);
+      .catch((error) => {
+        console.error('Failed to load groups:', error);
       })
-      .finally(() => setLoading(false));
-  };
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [fetchGroups]);
+
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner" />
+        <p>Loading SettleSmart...</p>
+      </div>
+    );
+  }
 
   return (
-    <BrowserRouter>
-      <div className="app-layout">
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+    <div className="app-layout">
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-        <div className="main-wrapper">
-          <Navbar 
-            groups={groups} 
-            selectedGroupId={selectedGroupId} 
-            onSelectGroup={(id) => setSelectedGroupId(id)}
-            onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
-          />
+      {isSidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Close navigation"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-          <main style={{ flex: 1, minHeight: 'calc(100vh - 68px)' }}>
-            <Routes>
-              <Route 
-                path="/" 
-                element={<DashboardPage selectedGroupId={selectedGroupId} groups={groups} />} 
-              />
-              <Route 
-                path="/groups" 
-                element={<GroupsPage onGroupCreated={(newId) => fetchGroups(newId)} />} 
-              />
-              <Route 
-                path="/groups/:id" 
-                element={<GroupDetailPage />} 
-              />
-              <Route 
-                path="/add-expense" 
-                element={<AddExpensePage selectedGroupId={selectedGroupId} groups={groups} />} 
-              />
-              <Route 
-                path="/expenses" 
-                element={<ExpenseHistoryPage selectedGroupId={selectedGroupId} groups={groups} />} 
-              />
-              <Route 
-                path="/balances" 
-                element={<BalancesPage selectedGroupId={selectedGroupId} groups={groups} />} 
-              />
-              <Route 
-                path="/simplify" 
-                element={<DebtSimplificationPage selectedGroupId={selectedGroupId} groups={groups} />} 
-              />
-              <Route 
-                path="/settlements" 
-                element={<SettlementsReportPage selectedGroupId={selectedGroupId} groups={groups} />} 
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-        </div>
+      <div className="main-wrapper">
+        <Navbar
+          groups={groups}
+          selectedGroupId={selectedGroupId}
+          onSelectGroup={setSelectedGroupId}
+          onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
+        />
+
+        <main className="main-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <DashboardPage
+                  selectedGroupId={selectedGroupId}
+                  groups={groups}
+                />
+              }
+            />
+
+            <Route
+              path="/groups"
+              element={
+                <GroupsPage
+                  onGroupCreated={(newId) => fetchGroups(newId)}
+                />
+              }
+            />
+
+            <Route
+              path="/groups/:id"
+              element={<GroupDetailPage />}
+            />
+
+            <Route
+              path="/add-expense"
+              element={
+                <AddExpensePage
+                  selectedGroupId={selectedGroupId}
+                  groups={groups}
+                />
+              }
+            />
+
+            <Route
+              path="/expenses"
+              element={
+                <ExpenseHistoryPage
+                  selectedGroupId={selectedGroupId}
+                  groups={groups}
+                />
+              }
+            />
+
+            <Route
+              path="/balances"
+              element={
+                <BalancesPage
+                  selectedGroupId={selectedGroupId}
+                  groups={groups}
+                />
+              }
+            />
+
+            <Route
+              path="/simplify"
+              element={
+                <DebtSimplificationPage
+                  selectedGroupId={selectedGroupId}
+                  groups={groups}
+                />
+              }
+            />
+
+            <Route
+              path="/settlements"
+              element={
+                <SettlementsReportPage
+                  selectedGroupId={selectedGroupId}
+                  groups={groups}
+                />
+              }
+            />
+
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
+          </Routes>
+        </main>
       </div>
-    </BrowserRouter>
+    </div>
   );
 }

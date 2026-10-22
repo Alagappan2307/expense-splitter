@@ -1,43 +1,68 @@
+
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, RefreshCw, Table, BarChart3, X, LifeBuoy } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  PlusCircle,
+  Receipt,
+  Wallet,
+  ArrowRightLeft,
+  BarChart3,
+  X,
+  WalletCards,
+} from 'lucide-react';
 
 export default function Sidebar({ isOpen, onClose }) {
   const navItems = [
     { to: '/', label: 'Dashboard Overview', icon: LayoutDashboard },
-    { to: '/create', label: 'Create New Ticket', icon: PlusCircle },
-    { to: '/update-status', label: 'Update Latest Status', icon: RefreshCw },
-    { to: '/tickets', label: 'View All Tickets', icon: Table },
-    { to: '/report', label: 'Admin Report', icon: BarChart3 },
+    { to: '/groups', label: 'Expense Groups', icon: Users },
+    { to: '/add-expense', label: 'Add Expense', icon: PlusCircle },
+    { to: '/expenses', label: 'Expense History', icon: Receipt },
+    { to: '/balances', label: 'Member Balances', icon: Wallet },
+    { to: '/simplify', label: 'Simplify Debts', icon: ArrowRightLeft },
+    { to: '/settlements', label: 'Settlements Report', icon: BarChart3 },
   ];
 
   return (
     <>
-      {isOpen && <div className="sidebar-backdrop" onClick={onClose} />}
-      <aside className={`app-sidebar ${isOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <div className="sidebar-logo">
-            <LifeBuoy size={24} color="#3b82f6" />
-            <span>Helpdesk Hub</span>
+          <div className="logo-badge">
+            <WalletCards size={20} />
+            <span>SETTLESMART</span>
           </div>
-          <button className="close-sidebar-btn" onClick={onClose}>
+
+          <h2 className="app-title">Intelligent Settlement System</h2>
+          <p className="app-subtitle">
+            Smart expense splitting and debt settlement
+          </p>
+
+          <button
+            type="button"
+            className="close-sidebar-btn"
+            onClick={onClose}
+            aria-label="Close sidebar"
+          >
             <X size={20} />
           </button>
         </div>
 
-        <div className="sidebar-section-title">CORE MODULES</div>
-        <nav className="sidebar-nav">
+        <nav className="nav-links" aria-label="Main navigation">
           {navItems.map((item) => {
             const Icon = item.icon;
+
             return (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === '/'}
-                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                className={({ isActive }) =>
+                  `nav-link ${isActive ? 'active' : ''}`
+                }
                 onClick={onClose}
               >
-                <Icon size={18} className="nav-item-icon" />
+                <Icon size={18} />
                 <span>{item.label}</span>
               </NavLink>
             );
@@ -45,11 +70,10 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="system-badge">
-            <span className="status-indicator online" />
-            <span>MySQL Connected</span>
+          <div className="student-badge">
+            <div>Expense tracking enabled</div>
+            <small>SettleSmart v1.0.0</small>
           </div>
-          <small className="system-version">v1.0.0 Production</small>
         </div>
       </aside>
     </>

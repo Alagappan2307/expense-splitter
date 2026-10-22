@@ -1,33 +1,72 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Headphones, PlusCircle, BarChart3, Menu } from 'lucide-react';
+import {
+  WalletCards,
+  PlusCircle,
+  Users,
+  Menu,
+} from 'lucide-react';
 
-export default function Navbar({ onToggleSidebar }) {
+export default function Navbar({
+  groups = [],
+  selectedGroupId,
+  onSelectGroup,
+  onToggleSidebar,
+}) {
   return (
     <header className="top-navbar">
-      <div className="nav-brand-container">
-        <button className="menu-toggle" onClick={onToggleSidebar} aria-label="Toggle Menu">
+      <div className="group-selector-wrap">
+        <button
+          type="button"
+          className="menu-toggle"
+          onClick={onToggleSidebar}
+          aria-label="Toggle navigation"
+        >
           <Menu size={22} />
         </button>
-        <div className="brand-title-group">
-          <div className="brand-icon">
-            <Headphones size={22} color="#3b82f6" />
-          </div>
-          <div>
-            <h1 className="brand-name">Helpdesk Management System</h1>
-            <p className="brand-subtitle">Create, track, and manage technical support tickets</p>
-          </div>
+
+        <div className="brand-icon">
+          <WalletCards size={22} />
+        </div>
+
+        <div>
+          <h1 className="brand-name">SettleSmart</h1>
+          <p className="brand-subtitle">
+            Intelligent Expense Settlement System
+          </p>
         </div>
       </div>
 
       <div className="nav-actions">
-        <Link to="/create" className="btn btn-primary btn-sm">
-          <PlusCircle size={16} />
-          <span>Create Ticket</span>
+        <select
+          className="group-select"
+          aria-label="Select expense group"
+          value={selectedGroupId ?? ''}
+          onChange={(event) =>
+            onSelectGroup(
+              event.target.value === ''
+                ? null
+                : Number(event.target.value)
+            )
+          }
+        >
+          <option value="">Select group</option>
+          {groups.map((group) => (
+            <option key={group.id} value={group.id}>
+              {group.name}
+            </option>
+          ))}
+        </select>
+
+        <Link to="/groups" className="btn btn-secondary btn-sm">
+          <Users size={16} />
+          <span>Groups</span>
         </Link>
-        <Link to="/report" className="btn btn-secondary btn-sm">
-          <BarChart3 size={16} />
-          <span>Admin Report</span>
+
+        <Link to="/add-expense" className="btn btn-primary btn-sm">
+          <PlusCircle size={16} />
+          <span>Add Expense</span>
         </Link>
       </div>
     </header>
